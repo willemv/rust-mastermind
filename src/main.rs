@@ -34,7 +34,9 @@ fn print_color_names(colors: &Vec<Color>, t: &mut Box<term::StdoutTerminal>) {
     t.reset().unwrap();
 }
 
-fn print_colors(colors: &Vec<Color>, t: &mut Box<term::StdoutTerminal>) {
+fn print_colors<'a, I>(colors: I, t: &mut Box<term::StdoutTerminal>)
+    where I: IntoIterator<Item=&'a Color>
+{
     let circle = '\u{25CF}';
     for color in colors {
         t.fg(color.color).unwrap();
@@ -63,7 +65,7 @@ fn main() {
 
 
     println!("");
-    let mut rng = rand::os::OsRng::new().unwrap();
+    let mut rng = thread_rng();
     let secret = sample(&mut rng, &all_colors, 4);
 
     let mut guess = String::with_capacity(6);
@@ -102,13 +104,13 @@ fn main() {
                 }
 
                 print!("     ");
-                for _ in (0..correct_position) {
+                for _ in 0..correct_position {
                     print!("X ")
                 }
-                for _ in (0..correct_color) {
+                for _ in 0..correct_color {
                     print!("O ")
                 }
-                for _ in (0..(4-correct_position - correct_color)) {
+                for _ in 0..(4-correct_position - correct_color) {
                     print!(". ");
                 }
                 println!();
@@ -125,8 +127,5 @@ fn main() {
         println!("Too bad, better luck next time!");
         println!("The secret was:");
     }
-    for color in secret {
-        print!("{}, ", color.name);
-    }
-    println!("");
+    print_colors(secret.iter().cloned(), &mut t);
 }
