@@ -1,7 +1,8 @@
 extern crate rand;
 extern crate term;
 
-use rand::{thread_rng, sample};
+use rand::prelude::*;
+use rand::seq::SliceRandom;
 use std::io;
 
 type StdOut = Box<term::StdoutTerminal>;
@@ -153,6 +154,6 @@ fn check_guess(guess: &String, all_colors: &Vec<Color>, t: &mut StdOut, secret: 
 
 fn create_secret(all_colors: &Vec<Color>) -> Vec<&Color> {
     let mut rng = thread_rng();
-    let secret = sample(&mut rng, all_colors, 4);
-    return secret;
+    let secret = all_colors.choose_multiple(&mut rng, 4);
+    return secret.collect();
 }
