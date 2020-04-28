@@ -48,6 +48,21 @@ fn print_colors<'a, I>(colors: I, stdout: &mut StdOut)
     stdout.reset().unwrap();
 }
 
+// there seems to be a bug in the term crate where it always pretends to be an xterm TERM
+// this makes delete_line unsupported
+// bypass the terminfo discovery, and just make a WinConsole directly
+#[cfg(windows)]
+pub fn stdout() -> Option<Box<term::StdoutTerminal>> {
+    term::WinConsole::new(io::stdout())
+    .ok()
+    .map(|t| Box::new(t) as Box<term::StdoutTerminal>)
+}
+
+#[cfg(not(windows))]
+pub fn stdout() -> Option<Box<StdoutTerminal>> {
+    term::stdout()
+}
+
 fn main() {
     let all_colors: Vec<Color> = vec![
         Color{name: 'R', color: term::color::RED},
@@ -58,7 +73,7 @@ fn main() {
         Color{name: 'P', color: term::color::MAGENTA}
     ];
     
-    let mut t = term::stdout().unwrap();
+    let mut t = stdout().unwrap();
     
     print_intro(&all_colors, &mut t);
 
