@@ -1,3 +1,6 @@
+// #[macro_use]
+// extern crate clap;
+
 extern crate rand;
 extern crate term;
 
@@ -11,6 +14,12 @@ type StdOut = Box<term::StdoutTerminal>;
 struct Color {
     name: char,
     color: term::color::Color,
+}
+
+impl PartialEq for Color {
+    fn eq(&self, other: &Self) -> bool {
+        self.name == other.name
+    }
 }
 
 fn into_colors(guess: Vec<char>, all_colors: &Vec<Color>) -> Option<Vec<Color>> {
@@ -59,8 +68,13 @@ pub fn stdout() -> Option<Box<term::StdoutTerminal>> {
 }
 
 #[cfg(not(windows))]
-pub fn stdout() -> Option<Box<StdoutTerminal>> {
+pub fn stdout() -> Option<Box<term::StdoutTerminal>> {
     term::stdout()
+}
+
+enum GuessResult {
+    Correct,
+    Incorrect(String),
 }
 
 fn main() {
@@ -77,34 +91,49 @@ fn main() {
     
     print_intro(&all_colors, &mut t);
 
-    // let mut guess = String::with_capacity(6);
-
     let mut guess_count = 0;
-    let mut guess_correct = false;
 
     let secret = create_secret(&all_colors);
-     
-    while !guess_correct && guess_count < 6 {
+    print_colors(&secret, &mut t);
+    println!();
+    loop {
         println!("Enter your guess: ");
-        // guess.clear();
         match read_guess() {
             Ok(guess) => {
-                erase_guess_from_terminal(&mut t);
-                check_guess(&guess, &all_colors, &mut t, &secret, &mut guess_correct);
+                erase_guess_from_terminal(&mut t).unwrap();
+                let guessed_colors = parse_guess(&guess, &all_colors, secret.len());
+                print_colors(&guessed_colors, &mut t);
+                match check_guess(&guessed_colors, &secret) {
+                    GuessResult::Correct => {
+                        println!();
+                        println!("Congratulations, you got the correct colors!");
+                        print_colors(&secret, &mut t);
+                        println!();
+                        break;
+                    }
+                    GuessResult::Incorrect(key) => {
+                        guess_count += 1;
+                        if guess_count < 6 {
+                            println!("{}", key);
+                            continue;
+                        } else {
+                            println!();
+                            println!("Too bad, better luck next time!");
+                            println!("The secret was:");
+                            print_colors(&secret, &mut t);
+                            println!();
+                            break;
+                        }
+                    }
+                }
             }
             Err(error) => {
                 println!("Error: {}", error);
             }
         }
-        guess_count = guess_count + 1;
     }
-    if guess_correct {
-        println!("Congratulations, you got the correct colors!");
-    } else {
-        println!("Too bad, better luck next time!");
-        println!("The secret was:");
-    }
-    print_colors(secret.iter().cloned(), &mut t);
+    
+    println!();
 }
 
 fn print_intro(all_colors: &Vec<Color>, t: &mut StdOut) { 
@@ -124,21 +153,28 @@ fn read_guess() -> io::Result<String> {
    io::stdin().read_line(&mut guess).and(Ok(guess))
 }
 
-fn erase_guess_from_terminal(t: &mut StdOut) {
-    t.cursor_up().unwrap();
-    t.delete_line().unwrap();
-    t.cursor_up().unwrap();
-    t.delete_line().unwrap();
+fn erase_guess_from_terminal(t: &mut StdOut) -> Result<(), term::Error> {
+    t.cursor_up()?;
+    t.delete_line()?;
+    t.cursor_up()?;
+    t.delete_line()?;
+    Ok(())
 }
 
-fn check_guess(guess: &String, all_colors: &Vec<Color>, t: &mut StdOut, secret: &Vec<&Color>, guess_correct: &mut bool) {
+fn parse_guess(guess: &String, all_colors: &Vec<Color>, max_len: usize) -> Vec<Color> {
+    let clean_guess = guess.trim().to_uppercase();
+    let parsed = into_colors(clean_guess.chars().collect(), &all_colors).unwrap();
+    if parsed.len() != max_len { 
+        panic!("Incorrect number of colors") 
+    }
+    return parsed;
+}
+
+fn check_guess(guessed_colors: &Vec<Color>, secret: &Vec<Color>) -> GuessResult {
     let mut correct_position = 0;
     let mut correct_color = 0;
-    let clean_guess = guess.trim().to_uppercase();
-    let guessed_colors = into_colors(clean_guess.chars().collect(), &all_colors).unwrap();
-    print_colors(&guessed_colors, t);
-    for (guess_position, color_guess) in clean_guess.chars().enumerate() {
-        match secret.iter().position(|ref c| c.name == color_guess) {
+    for (guess_position, color_guess) in guessed_colors.iter().enumerate() {
+        match secret.iter().position(|ref c| *c == color_guess) {
             Some(position) => {
                 if guess_position == position {
                     correct_position = correct_position + 1;
@@ -150,25 +186,26 @@ fn check_guess(guess: &String, all_colors: &Vec<Color>, t: &mut StdOut, secret: 
         }
     }
     if correct_position == 4 {
-        *guess_correct = true;
+        return GuessResult::Correct;
     }
 
+    let mut key=  String::new();
     print!("     ");
     for _ in 0..correct_position {
-        print!("X ")
+        key += "X ";
     }
     for _ in 0..correct_color {
-        print!("O ")
+        key += "O ";
     }
     for _ in 0..(4-correct_position - correct_color) {
-        print!(". ");
+        key += ". ";
     }
-    println!();
+    return GuessResult::Incorrect(key);
 
 }
 
-fn create_secret(all_colors: &Vec<Color>) -> Vec<&Color> {
+fn create_secret(all_colors: &Vec<Color>) -> Vec<Color> {
     let mut rng = thread_rng();
     let secret = all_colors.choose_multiple(&mut rng, 4);
-    return secret.collect();
+    return secret.cloned().collect();
 }
