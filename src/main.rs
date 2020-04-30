@@ -22,7 +22,7 @@ impl PartialEq for Color {
     }
 }
 
-fn into_colors(guess: Vec<char>, all_colors: &Vec<Color>) -> Option<Vec<Color>> {
+fn into_colors(guess: Vec<char>, all_colors: &Vec<Color>) -> Result<Vec<Color>, String> {
     let mut result: Vec<Color> = Vec::with_capacity(guess.len());
     for &g in guess.iter() {
         match all_colors.iter().find(|ref c| c.name == g) {
@@ -30,12 +30,12 @@ fn into_colors(guess: Vec<char>, all_colors: &Vec<Color>) -> Option<Vec<Color>> 
                 result.push(*color);
             }
             None => {
-                // println!("Could not find color {}", g);
+                return Err(format!("Invalid color: {}", g))
             }
         }
     }
     
-    return Some(result);
+    return Ok(result);
 }
 
 fn print_color_names(colors: &Vec<Color>, stdout: &mut StdOut) {
@@ -72,7 +72,7 @@ pub fn stdout() -> Option<Box<term::StdoutTerminal>> {
     term::stdout()
 }
 
-enum GuessResult {
+enum Grade {
     Correct,
     Incorrect(String),
 }
@@ -91,38 +91,50 @@ fn main() {
     
     print_intro(&all_colors, &mut t);
 
+    let debug = true;
+    let max_attempts = 6;
     let mut guess_count = 0;
 
     let secret = create_secret(&all_colors);
-    print_colors(&secret, &mut t);
-    println!();
+    if debug {
+        print_colors(&secret, &mut t);
+        println!();
+    }
     loop {
-        println!("Enter your guess: ");
+        println!("Enter your guess (attempt {} of {}): ", guess_count + 1, max_attempts);
         match read_guess() {
             Ok(guess) => {
                 erase_guess_from_terminal(&mut t).unwrap();
-                let guessed_colors = parse_guess(&guess, &all_colors, secret.len());
-                print_colors(&guessed_colors, &mut t);
-                match check_guess(&guessed_colors, &secret) {
-                    GuessResult::Correct => {
+                match parse_guess(&guess, &all_colors, secret.len()) {
+                    Err(message) => {
                         println!();
-                        println!("Congratulations, you got the correct colors!");
-                        print_colors(&secret, &mut t);
-                        println!();
-                        break;
+                        println!("Invalid guess: {}", message);
+                        continue;
                     }
-                    GuessResult::Incorrect(key) => {
-                        guess_count += 1;
-                        if guess_count < 6 {
-                            println!("{}", key);
-                            continue;
-                        } else {
-                            println!();
-                            println!("Too bad, better luck next time!");
-                            println!("The secret was:");
-                            print_colors(&secret, &mut t);
-                            println!();
-                            break;
+                    Ok(guessed_colors) => {
+                        print_colors(&guessed_colors, &mut t);
+                        match grade(&guessed_colors, &secret) {
+                            Grade::Correct => {
+                                println!();
+                                println!("Congratulations, you got the correct colors!");
+                                print_colors(&secret, &mut t);
+                                println!();
+                                break;
+                            }
+                            Grade::Incorrect(key) => {
+                                guess_count += 1;
+                                if guess_count < max_attempts {
+                                    println!("{}", key);
+                                    continue;
+                                } else {
+                                    println!();
+                                    println!("Too bad, better luck next time!");
+                                    println!("The secret was:");
+                                    print_colors(&secret, &mut t);
+                                    println!();
+                                    break;
+                                }
+                            }
                         }
                     }
                 }
@@ -161,16 +173,16 @@ fn erase_guess_from_terminal(t: &mut StdOut) -> Result<(), term::Error> {
     Ok(())
 }
 
-fn parse_guess(guess: &String, all_colors: &Vec<Color>, max_len: usize) -> Vec<Color> {
+fn parse_guess(guess: &String, all_colors: &Vec<Color>, max_len: usize) -> Result<Vec<Color>, String> {
     let clean_guess = guess.trim().to_uppercase();
-    let parsed = into_colors(clean_guess.chars().collect(), &all_colors).unwrap();
+    let parsed = into_colors(clean_guess.chars().collect(), &all_colors)?;
     if parsed.len() != max_len { 
-        panic!("Incorrect number of colors") 
+        return Err("Incorrect number of colors".to_string()) 
     }
-    return parsed;
+    return Ok(parsed);
 }
 
-fn check_guess(guessed_colors: &Vec<Color>, secret: &Vec<Color>) -> GuessResult {
+fn grade(guessed_colors: &Vec<Color>, secret: &Vec<Color>) -> Grade {
     let mut correct_position = 0;
     let mut correct_color = 0;
     for (guess_position, color_guess) in guessed_colors.iter().enumerate() {
@@ -186,7 +198,7 @@ fn check_guess(guessed_colors: &Vec<Color>, secret: &Vec<Color>) -> GuessResult 
         }
     }
     if correct_position == 4 {
-        return GuessResult::Correct;
+        return Grade::Correct;
     }
 
     let mut key=  String::new();
@@ -200,7 +212,7 @@ fn check_guess(guessed_colors: &Vec<Color>, secret: &Vec<Color>) -> GuessResult 
     for _ in 0..(4-correct_position - correct_color) {
         key += ". ";
     }
-    return GuessResult::Incorrect(key);
+    return Grade::Incorrect(key);
 
 }
 
