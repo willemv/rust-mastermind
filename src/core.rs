@@ -10,7 +10,11 @@ pub enum Color {
 
 pub enum Grade {
     Correct,
-    Incorrect{correct_position: usize, correct_color: usize, wrong: usize},
+    Incorrect {
+        correct_position: usize,
+        correct_color: usize,
+        wrong: usize,
+    },
 }
 
 pub fn grade(guess: &Vec<Color>, solution: &Vec<Color>) -> Grade {
@@ -32,7 +36,7 @@ pub fn grade(guess: &Vec<Color>, solution: &Vec<Color>) -> Grade {
         return Grade::Correct;
     }
 
-    return Grade::Incorrect{
+    return Grade::Incorrect {
         correct_position,
         correct_color,
         wrong: solution.len() - correct_position - correct_color,

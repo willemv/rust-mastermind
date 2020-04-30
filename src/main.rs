@@ -28,12 +28,10 @@ fn into_colors(guess: Vec<char>, all_colors: &Vec<Color>) -> Result<Vec<Color>, 
             Some(color) => {
                 result.push(*color);
             }
-            None => {
-                return Err(format!("Invalid color: {}", g))
-            }
+            None => return Err(format!("Invalid color: {}", g)),
         }
     }
-    
+
     return Ok(result);
 }
 
@@ -46,7 +44,8 @@ fn print_color_names(colors: &Vec<Color>, stdout: &mut StdOut) {
 }
 
 fn print_colors<'a, I>(colors: I, stdout: &mut StdOut)
-    where I: IntoIterator<Item=&'a Color>
+where
+    I: IntoIterator<Item = &'a Color>,
 {
     let circle = '\u{25CF}';
     for color in colors {
@@ -62,8 +61,8 @@ fn print_colors<'a, I>(colors: I, stdout: &mut StdOut)
 #[cfg(windows)]
 fn stdout() -> Option<Box<term::StdoutTerminal>> {
     term::WinConsole::new(io::stdout())
-    .ok()
-    .map(|t| Box::new(t) as Box<term::StdoutTerminal>)
+        .ok()
+        .map(|t| Box::new(t) as Box<term::StdoutTerminal>)
 }
 
 #[cfg(not(windows))]
@@ -71,19 +70,42 @@ fn stdout() -> Option<Box<term::StdoutTerminal>> {
     term::stdout()
 }
 
-
 fn main() {
     let all_colors: Vec<Color> = vec![
-        Color{name: 'R', color: core::Color::RED, term_color: term::color::RED},
-        Color{name: 'G', color: core::Color::GREEN, term_color: term::color::GREEN},
-        Color{name: 'Y', color: core::Color::YELLOW, term_color: term::color::YELLOW},
-        Color{name: 'B', color: core::Color::BLUE, term_color: term::color::BLUE},
-        Color{name: 'C', color: core::Color::CYAN, term_color: term::color::CYAN},
-        Color{name: 'P', color: core::Color::PURPLE, term_color: term::color::MAGENTA}
+        Color {
+            name: 'R',
+            color: core::Color::RED,
+            term_color: term::color::RED,
+        },
+        Color {
+            name: 'G',
+            color: core::Color::GREEN,
+            term_color: term::color::GREEN,
+        },
+        Color {
+            name: 'Y',
+            color: core::Color::YELLOW,
+            term_color: term::color::YELLOW,
+        },
+        Color {
+            name: 'B',
+            color: core::Color::BLUE,
+            term_color: term::color::BLUE,
+        },
+        Color {
+            name: 'C',
+            color: core::Color::CYAN,
+            term_color: term::color::CYAN,
+        },
+        Color {
+            name: 'P',
+            color: core::Color::PURPLE,
+            term_color: term::color::MAGENTA,
+        },
     ];
-    
+
     let mut t = stdout().unwrap();
-    
+
     print_intro(&all_colors, &mut t);
 
     let debug = true;
@@ -96,7 +118,11 @@ fn main() {
     }
     let mut guess_count = 0;
     loop {
-        println!("Enter your guess (attempt {} of {}): ", guess_count + 1, max_attempts);
+        println!(
+            "Enter your guess (attempt {} of {}): ",
+            guess_count + 1,
+            max_attempts
+        );
         match read_guess() {
             Ok(guess) => {
                 erase_guess_from_terminal(&mut t).unwrap();
@@ -117,9 +143,13 @@ fn main() {
                                 println!();
                                 break;
                             }
-                            core::Grade::Incorrect{correct_position, correct_color, wrong} => {
+                            core::Grade::Incorrect {
+                                correct_position,
+                                correct_color,
+                                wrong,
+                            } => {
                                 guess_count += 1;
-                                
+
                                 print!("     ");
                                 for _ in 0..correct_position {
                                     print!("X ");
@@ -153,8 +183,7 @@ fn main() {
     }
 }
 
-fn print_intro(all_colors: &Vec<Color>, t: &mut StdOut) { 
-
+fn print_intro(all_colors: &Vec<Color>, t: &mut StdOut) {
     println!("Grading: X = correct position, O = correct color, . = wrong");
     println!("Available colors:");
     print_color_names(all_colors, t);
@@ -166,8 +195,8 @@ fn print_intro(all_colors: &Vec<Color>, t: &mut StdOut) {
 }
 
 fn read_guess() -> io::Result<String> {
-   let mut guess = String::with_capacity(6);
-   io::stdin().read_line(&mut guess).and(Ok(guess))
+    let mut guess = String::with_capacity(6);
+    io::stdin().read_line(&mut guess).and(Ok(guess))
 }
 
 fn erase_guess_from_terminal(t: &mut StdOut) -> Result<(), term::Error> {
@@ -178,11 +207,15 @@ fn erase_guess_from_terminal(t: &mut StdOut) -> Result<(), term::Error> {
     Ok(())
 }
 
-fn parse_guess(guess: &String, all_colors: &Vec<Color>, max_len: usize) -> Result<Vec<Color>, String> {
+fn parse_guess(
+    guess: &String,
+    all_colors: &Vec<Color>,
+    max_len: usize,
+) -> Result<Vec<Color>, String> {
     let clean_guess = guess.trim().to_uppercase();
     let parsed = into_colors(clean_guess.chars().collect(), &all_colors)?;
-    if parsed.len() != max_len { 
-        return Err("Incorrect number of colors".to_string()) 
+    if parsed.len() != max_len {
+        return Err("Incorrect number of colors".to_string());
     }
     return Ok(parsed);
 }
