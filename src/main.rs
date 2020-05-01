@@ -8,6 +8,39 @@ use rand::prelude::*;
 use rand::seq::SliceRandom;
 use std::io;
 
+static ALL_COLORS: [Color; 6] = [
+    Color {
+        name: 'R',
+        color: core::Color::RED,
+        term_color: term::color::RED,
+    },
+    Color {
+        name: 'G',
+        color: core::Color::GREEN,
+        term_color: term::color::GREEN,
+    },
+    Color {
+        name: 'Y',
+        color: core::Color::YELLOW,
+        term_color: term::color::YELLOW,
+    },
+    Color {
+        name: 'B',
+        color: core::Color::BLUE,
+        term_color: term::color::BLUE,
+    },
+    Color {
+        name: 'C',
+        color: core::Color::CYAN,
+        term_color: term::color::CYAN,
+    },
+    Color {
+        name: 'P',
+        color: core::Color::PURPLE,
+        term_color: term::color::MAGENTA,
+    },
+];
+
 type StdOut = Box<term::StdoutTerminal>;
 
 #[derive(Debug, Copy, Clone)]
@@ -21,20 +54,6 @@ impl PartialEq for Color {
     fn eq(&self, other: &Self) -> bool {
         self.name == other.name
     }
-}
-
-fn into_colors(guess: Vec<char>, all_colors: &[Color]) -> Result<Vec<Color>, String> {
-    let mut result: Vec<Color> = Vec::with_capacity(guess.len());
-    for &g in guess.iter() {
-        match all_colors.iter().find(|ref c| c.name == g) {
-            Some(color) => {
-                result.push(*color);
-            }
-            None => return Err(format!("Invalid color: {}", g)),
-        }
-    }
-
-    Ok(result)
 }
 
 fn print_color_names(colors: &[Color], stdout: &mut StdOut) {
@@ -90,44 +109,11 @@ fn main() {
         .and_then(|s| s.parse::<u32>().ok())
         .unwrap_or(12);
 
-    let all_colors: Vec<Color> = vec![
-        Color {
-            name: 'R',
-            color: core::Color::RED,
-            term_color: term::color::RED,
-        },
-        Color {
-            name: 'G',
-            color: core::Color::GREEN,
-            term_color: term::color::GREEN,
-        },
-        Color {
-            name: 'Y',
-            color: core::Color::YELLOW,
-            term_color: term::color::YELLOW,
-        },
-        Color {
-            name: 'B',
-            color: core::Color::BLUE,
-            term_color: term::color::BLUE,
-        },
-        Color {
-            name: 'C',
-            color: core::Color::CYAN,
-            term_color: term::color::CYAN,
-        },
-        Color {
-            name: 'P',
-            color: core::Color::PURPLE,
-            term_color: term::color::MAGENTA,
-        },
-    ];
-
     let mut t = stdout().unwrap();
 
-    print_intro(&all_colors, &mut t);
+    print_intro(&ALL_COLORS, &mut t);
 
-    let secret = create_secret(&all_colors, same_color);
+    let secret = create_secret(&ALL_COLORS, same_color);
     if debug {
         print_colors(&secret, &mut t);
         println!();
@@ -135,102 +121,59 @@ fn main() {
     let mut guess_count = 0;
     loop {
         println!("Enter your guess (attempt {} of {}): ", guess_count + 1, max_attempts);
-        match read_guess() {
-            Ok(guess) => {
+        match read_guess(secret.len()) {
+            Ok(guessed_colors) => {
                 erase_guess_from_terminal(&mut t).unwrap();
-                match parse_guess(&guess, &all_colors, secret.len()) {
-                    Err(message) => {
+                print_colors(&guessed_colors, &mut t);
+                let core_colors: Vec<core::Color> = guessed_colors.iter().map(|c| c.color).collect();
+                let core_secret: Vec<core::Color> = secret.iter().map(|c| c.color).collect();
+                match core::grade(&core_colors, &core_secret) {
+                    core::Grade::Invalid(message) => {
                         println!();
                         println!("Invalid guess: {}", message);
                     }
-                    Ok(guessed_colors) => {
-                        print_colors(&guessed_colors, &mut t);
-                        let core_colors: Vec<core::Color> = guessed_colors.iter().map(|c| c.color).collect();
-                        let core_secret: Vec<core::Color> = secret.iter().map(|c| c.color).collect();
-                        match core::grade(&core_colors, &core_secret) {
-                            core::Grade::Invalid(message) => {
-                                println!();
-                                println!("Invalid guess: {}", message);
-                            }
-                            core::Grade::Correct => {
-                                println!();
-                                println!("Congratulations, you got the correct colors!");
-                                print_colors(&secret, &mut t);
-                                println!();
-                                break;
-                            }
-                            core::Grade::Incorrect {
-                                correct_position,
-                                correct_color,
-                                wrong,
-                            } => {
-                                guess_count += 1;
+                    core::Grade::Correct => {
+                        println!();
+                        println!("Congratulations, you got the correct colors!");
+                        print_colors(&secret, &mut t);
+                        println!();
+                        break;
+                    }
+                    core::Grade::Incorrect {
+                        correct_position,
+                        correct_color,
+                        wrong,
+                    } => {
+                        guess_count += 1;
 
-                                print!("     ");
-                                for _ in 0..correct_position {
-                                    print!("X ");
-                                }
-                                for _ in 0..correct_color {
-                                    print!("O ");
-                                }
-                                for _ in 0..wrong {
-                                    print!(". ");
-                                }
-                                println!();
-                                if guess_count < max_attempts {
-                                    continue;
-                                } else {
-                                    println!();
-                                    println!("Too bad, better luck next time!");
-                                    println!("The secret was:");
-                                    print_colors(&secret, &mut t);
-                                    println!();
-                                    break;
-                                }
-                            }
+                        print!("     ");
+                        for _ in 0..correct_position {
+                            print!("X ");
+                        }
+                        for _ in 0..correct_color {
+                            print!("O ");
+                        }
+                        for _ in 0..wrong {
+                            print!(". ");
+                        }
+                        println!();
+                        if guess_count < max_attempts {
+                            continue;
+                        } else {
+                            println!();
+                            println!("Too bad, better luck next time!");
+                            println!("The secret was:");
+                            print_colors(&secret, &mut t);
+                            println!();
+                            break;
                         }
                     }
                 }
             }
             Err(error) => {
-                println!("Terminal error: {}", error);
+                println!("Guess invalid: {}", error);
             }
         }
-    }
-}
-
-fn print_intro(all_colors: &[Color], t: &mut StdOut) {
-    println!("Grading: X = correct position, O = correct color, . = wrong");
-    println!("Available colors:");
-    print_color_names(all_colors, t);
-    println!();
-    print_colors(all_colors, t);
-    println!();
-
-    println!();
-}
-
-fn read_guess() -> io::Result<String> {
-    let mut guess = String::with_capacity(6);
-    io::stdin().read_line(&mut guess).and(Ok(guess))
-}
-
-fn erase_guess_from_terminal(t: &mut StdOut) -> Result<(), term::Error> {
-    t.cursor_up()?;
-    t.delete_line()?;
-    t.cursor_up()?;
-    t.delete_line()?;
-    Ok(())
-}
-
-fn parse_guess(guess: &str, all_colors: &[Color], max_len: usize) -> Result<Vec<Color>, String> {
-    let clean_guess = guess.trim().to_uppercase();
-    let parsed = into_colors(clean_guess.chars().collect(), &all_colors)?;
-
-    if parsed.len() != max_len {
-        Err("Incorrect number of colors".to_string())
-    } else {
-        Ok(parsed)
     }
 }
 
@@ -250,4 +193,57 @@ fn create_secret(all_colors: &[Color], same_color: bool) -> Vec<Color> {
             .cloned()
             .collect()
     }
+}
+
+fn print_intro(all_colors: &[Color], t: &mut StdOut) {
+    println!("Grading: X = correct position, O = correct color, . = wrong");
+    println!("Available colors:");
+    print_color_names(all_colors, t);
+    println!();
+    print_colors(all_colors, t);
+    println!();
+
+    println!();
+}
+
+fn erase_guess_from_terminal(t: &mut StdOut) -> Result<(), term::Error> {
+    t.cursor_up()?;
+    t.delete_line()?;
+    t.cursor_up()?;
+    t.delete_line()?;
+    Ok(())
+}
+
+fn read_guess(expected_len: usize) -> Result<Vec<Color>, String> {
+    let mut guess = String::with_capacity(6);
+    io::stdin()
+        .read_line(&mut guess)
+        .and(Ok(guess))
+        .map_err(|err| format!("I/O error: {}", err))
+        .and_then(|input| parse_guess(&input, expected_len))
+}
+
+fn parse_guess(guess: &str, expected_len: usize) -> Result<Vec<Color>, String> {
+    let clean_guess = guess.trim().to_uppercase();
+    let parsed = parse_colors(clean_guess.chars().collect())?;
+
+    if parsed.len() != expected_len {
+        Err("Incorrect number of colors".to_string())
+    } else {
+        Ok(parsed)
+    }
+}
+
+fn parse_colors(guess: Vec<char>) -> Result<Vec<Color>, String> {
+    let mut result: Vec<Color> = Vec::with_capacity(guess.len());
+    for &g in guess.iter() {
+        match ALL_COLORS.iter().find(|ref c| c.name == g) {
+            Some(color) => {
+                result.push(*color);
+            }
+            None => return Err(format!("Invalid color: {}", g)),
+        }
+    }
+
+    Ok(result)
 }
