@@ -1,3 +1,5 @@
+#[macro_use]
+extern crate clap;
 extern crate rand;
 extern crate term;
 mod core;
@@ -71,6 +73,21 @@ fn stdout() -> Option<Box<term::StdoutTerminal>> {
 }
 
 fn main() {
+    let app = clap_app!(mastermind =>
+        (version: "0.1")
+        (author: "Willem Verstraeten <willem.verstraeten@gmail.com")
+        (about: "Play mastermind on the command line")
+        (@arg debug: -d --debug "Enables debugging")
+        (@arg max_attempts: -a --max_attempts +takes_value "Sets the maximum number of attempts")
+    );
+    let matches = app.get_matches();
+
+    let debug = matches.is_present("debug");
+    let max_attempts = matches
+        .value_of("max_attempts")
+        .and_then(|s| s.parse::<u32>().ok())
+        .unwrap_or(6);
+
     let all_colors: Vec<Color> = vec![
         Color {
             name: 'R',
@@ -107,9 +124,6 @@ fn main() {
     let mut t = stdout().unwrap();
 
     print_intro(&all_colors, &mut t);
-
-    let debug = true;
-    let max_attempts = 6;
 
     let secret = create_secret(&all_colors);
     if debug {
