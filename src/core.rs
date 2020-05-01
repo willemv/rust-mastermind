@@ -18,30 +18,27 @@ pub enum Grade {
     },
 }
 
-pub fn grade(guess: &Vec<Color>, solution: &Vec<Color>) -> Grade {
+pub fn grade(guess: &[Color], solution: &[Color]) -> Grade {
     let mut correct_position = 0;
     let mut correct_color = 0;
     for (pos, color) in guess.iter().enumerate() {
-        match solution.iter().position(|ref c| *c == color) {
-            Some(position) => {
-                if pos == position {
-                    correct_position = correct_position + 1;
-                } else {
-                    correct_color = correct_color + 1;
-                }
+        if let Some(position) = solution.iter().position(|ref c| *c == color) {
+            if pos == position {
+                correct_position += 1;
+            } else {
+                correct_color += 1;
             }
-            None => {}
         }
     }
     if correct_position == solution.len() {
-        return Grade::Correct;
+        Grade::Correct
+    } else {
+        Grade::Incorrect {
+            correct_position,
+            correct_color,
+            wrong: solution.len() - correct_position - correct_color,
+        }
     }
-
-    return Grade::Incorrect {
-        correct_position,
-        correct_color,
-        wrong: solution.len() - correct_position - correct_color,
-    };
 }
 
 #[cfg(test)]
