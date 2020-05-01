@@ -43,13 +43,16 @@ pub fn grade(guess: &[Color], solution: &[Color]) -> Grade {
 
 #[cfg(test)]
 mod test {
-    use super::*;
     use super::Color::*;
+    use super::*;
 
     #[test]
     fn grade_correct() {
         assert!(matches!(
-            grade(&vec![RED, YELLOW, GREEN, BLUE], &vec![RED, YELLOW, GREEN, BLUE]), 
+            grade(
+                &vec![RED, YELLOW, GREEN, BLUE],
+                &vec![RED, YELLOW, GREEN, BLUE]
+            ),
             Grade::Correct
         ));
     }
@@ -57,8 +60,15 @@ mod test {
     #[test]
     fn grade_incorrect() {
         assert!(matches!(
-            grade(&vec![RED, YELLOW, GREEN, BLUE], &vec![RED, YELLOW, GREEN, PURPLE]), 
-            Grade::Incorrect{correct_position: 3, correct_color: 0, wrong: 1}
+            grade(
+                &vec![RED, YELLOW, GREEN, BLUE],
+                &vec![RED, YELLOW, GREEN, PURPLE]
+            ),
+            Grade::Incorrect {
+                correct_position: 3,
+                correct_color: 0,
+                wrong: 1
+            }
         ));
     }
 }

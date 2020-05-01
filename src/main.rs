@@ -23,7 +23,7 @@ impl PartialEq for Color {
     }
 }
 
-fn into_colors(guess: Vec<char>, all_colors:&[Color]) -> Result<Vec<Color>, String> {
+fn into_colors(guess: Vec<char>, all_colors: &[Color]) -> Result<Vec<Color>, String> {
     let mut result: Vec<Color> = Vec::with_capacity(guess.len());
     for &g in guess.iter() {
         match all_colors.iter().find(|ref c| c.name == g) {
@@ -147,8 +147,10 @@ fn main() {
                     }
                     Ok(guessed_colors) => {
                         print_colors(&guessed_colors, &mut t);
-                        let core_colors: Vec<core::Color> = guessed_colors.iter().map(|c| c.color).collect();
-                        let core_secret: Vec<core::Color> = secret.iter().map(|c| c.color).collect();
+                        let core_colors: Vec<core::Color> =
+                            guessed_colors.iter().map(|c| c.color).collect();
+                        let core_secret: Vec<core::Color> =
+                            secret.iter().map(|c| c.color).collect();
                         match core::grade(&core_colors, &core_secret) {
                             core::Grade::Correct => {
                                 println!();
@@ -221,14 +223,10 @@ fn erase_guess_from_terminal(t: &mut StdOut) -> Result<(), term::Error> {
     Ok(())
 }
 
-fn parse_guess(
-    guess: &str,
-    all_colors: &[Color],
-    max_len: usize,
-) -> Result<Vec<Color>, String> {
+fn parse_guess(guess: &str, all_colors: &[Color], max_len: usize) -> Result<Vec<Color>, String> {
     let clean_guess = guess.trim().to_uppercase();
     let parsed = into_colors(clean_guess.chars().collect(), &all_colors)?;
-    
+
     if parsed.len() != max_len {
         Err("Incorrect number of colors".to_string())
     } else {
