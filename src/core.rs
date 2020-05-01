@@ -8,6 +8,7 @@ pub enum Color {
     PURPLE,
 }
 
+#[derive(Debug)]
 pub enum Grade {
     Correct,
     Incorrect {
@@ -41,4 +42,26 @@ pub fn grade(guess: &Vec<Color>, solution: &Vec<Color>) -> Grade {
         correct_color,
         wrong: solution.len() - correct_position - correct_color,
     };
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+    use super::Color::*;
+
+    #[test]
+    fn grade_correct() {
+        assert!(matches!(
+            grade(&vec![RED, YELLOW, GREEN, BLUE], &vec![RED, YELLOW, GREEN, BLUE]), 
+            Grade::Correct
+        ));
+    }
+
+    #[test]
+    fn grade_incorrect() {
+        assert!(matches!(
+            grade(&vec![RED, YELLOW, GREEN, BLUE], &vec![RED, YELLOW, GREEN, PURPLE]), 
+            Grade::Incorrect{correct_position: 3, correct_color: 0, wrong: 1}
+        ));
+    }
 }
