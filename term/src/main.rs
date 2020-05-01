@@ -1,8 +1,8 @@
 #[macro_use]
 extern crate clap;
+extern crate mastermind;
 extern crate rand;
 extern crate term;
-mod core;
 
 use rand::prelude::*;
 use rand::seq::SliceRandom;
@@ -11,32 +11,32 @@ use std::io;
 static ALL_COLORS: [Color; 6] = [
     Color {
         name: 'R',
-        color: core::Color::RED,
+        color: mastermind::Color::RED,
         term_color: term::color::RED,
     },
     Color {
         name: 'G',
-        color: core::Color::GREEN,
+        color: mastermind::Color::GREEN,
         term_color: term::color::GREEN,
     },
     Color {
         name: 'Y',
-        color: core::Color::YELLOW,
+        color: mastermind::Color::YELLOW,
         term_color: term::color::YELLOW,
     },
     Color {
         name: 'B',
-        color: core::Color::BLUE,
+        color: mastermind::Color::BLUE,
         term_color: term::color::BLUE,
     },
     Color {
         name: 'C',
-        color: core::Color::CYAN,
+        color: mastermind::Color::CYAN,
         term_color: term::color::CYAN,
     },
     Color {
         name: 'P',
-        color: core::Color::PURPLE,
+        color: mastermind::Color::PURPLE,
         term_color: term::color::MAGENTA,
     },
 ];
@@ -46,7 +46,7 @@ type StdOut = Box<term::StdoutTerminal>;
 #[derive(Debug, Copy, Clone)]
 struct Color {
     name: char,
-    color: core::Color,
+    color: mastermind::Color,
     term_color: term::color::Color,
 }
 
@@ -125,21 +125,21 @@ fn main() {
             Ok(guessed_colors) => {
                 erase_guess_from_terminal(&mut t).unwrap();
                 print_colors(&guessed_colors, &mut t);
-                let core_colors: Vec<core::Color> = guessed_colors.iter().map(|c| c.color).collect();
-                let core_secret: Vec<core::Color> = secret.iter().map(|c| c.color).collect();
-                match core::grade(&core_colors, &core_secret) {
-                    core::Grade::Invalid(message) => {
+                let core_colors: Vec<mastermind::Color> = guessed_colors.iter().map(|c| c.color).collect();
+                let core_secret: Vec<mastermind::Color> = secret.iter().map(|c| c.color).collect();
+                match mastermind::grade(&core_colors, &core_secret) {
+                    mastermind::Grade::Invalid(message) => {
                         println!();
                         println!("Invalid guess: {}", message);
                     }
-                    core::Grade::Correct => {
+                    mastermind::Grade::Correct => {
                         println!();
                         println!("Congratulations, you got the correct colors!");
                         print_colors(&secret, &mut t);
                         println!();
                         break;
                     }
-                    core::Grade::Incorrect {
+                    mastermind::Grade::Incorrect {
                         correct_position,
                         correct_color,
                         wrong,

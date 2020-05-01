@@ -1,10 +1,5 @@
-[package]
-name = "rust-mastermind"
-version = "0.1.0"
-authors = ["Willem Verstraeten <willem.verstraeten@gmail.com>"]
-edition = "2018"
-
-[dependencies]
-rand = "*"
-term = "*"
-clap = "*"
+[workspace]
+members = [
+    "lib",
+    "term",
+]
