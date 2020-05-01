@@ -79,14 +79,16 @@ fn main() {
         (about: "Play mastermind on the command line")
         (@arg debug: -d --debug "Enables debugging")
         (@arg max_attempts: -a --max_attempts +takes_value "Sets the maximum number of attempts")
+        (@arg same_color: -s --same_color "Whether a color can occur multiple times in the solution")
     );
     let matches = app.get_matches();
 
     let debug = matches.is_present("debug");
+    let same_color = matches.is_present("same_color");
     let max_attempts = matches
         .value_of("max_attempts")
         .and_then(|s| s.parse::<u32>().ok())
-        .unwrap_or(6);
+        .unwrap_or(12);
 
     let all_colors: Vec<Color> = vec![
         Color {
@@ -125,18 +127,14 @@ fn main() {
 
     print_intro(&all_colors, &mut t);
 
-    let secret = create_secret(&all_colors);
+    let secret = create_secret(&all_colors, same_color);
     if debug {
         print_colors(&secret, &mut t);
         println!();
     }
     let mut guess_count = 0;
     loop {
-        println!(
-            "Enter your guess (attempt {} of {}): ",
-            guess_count + 1,
-            max_attempts
-        );
+        println!("Enter your guess (attempt {} of {}): ", guess_count + 1, max_attempts);
         match read_guess() {
             Ok(guess) => {
                 erase_guess_from_terminal(&mut t).unwrap();
@@ -147,11 +145,13 @@ fn main() {
                     }
                     Ok(guessed_colors) => {
                         print_colors(&guessed_colors, &mut t);
-                        let core_colors: Vec<core::Color> =
-                            guessed_colors.iter().map(|c| c.color).collect();
-                        let core_secret: Vec<core::Color> =
-                            secret.iter().map(|c| c.color).collect();
+                        let core_colors: Vec<core::Color> = guessed_colors.iter().map(|c| c.color).collect();
+                        let core_secret: Vec<core::Color> = secret.iter().map(|c| c.color).collect();
                         match core::grade(&core_colors, &core_secret) {
+                            core::Grade::Invalid(message) => {
+                                println!();
+                                println!("Invalid guess: {}", message);
+                            }
                             core::Grade::Correct => {
                                 println!();
                                 println!("Congratulations, you got the correct colors!");
@@ -234,8 +234,20 @@ fn parse_guess(guess: &str, all_colors: &[Color], max_len: usize) -> Result<Vec<
     }
 }
 
-fn create_secret(all_colors: &[Color]) -> Vec<Color> {
+fn create_secret(all_colors: &[Color], same_color: bool) -> Vec<Color> {
+    let size = 4;
     let mut rng = thread_rng();
-    let secret = all_colors.choose_multiple(&mut rng, 4);
-    secret.cloned().collect()
+    if !same_color {
+        let secret = all_colors.choose_multiple(&mut rng, size);
+        let mut colors: Vec<Color> = secret.cloned().collect();
+        colors.as_mut_slice().shuffle(&mut rng);
+        colors
+    } else {
+        let dist = rand::distributions::Uniform::new(0, all_colors.len());
+        rng.sample_iter(dist)
+            .take(size)
+            .map(|index| &all_colors[index])
+            .cloned()
+            .collect()
+    }
 }
