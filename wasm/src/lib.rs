@@ -2,8 +2,8 @@ extern crate mastermind;
 
 mod utils;
 
-use mastermind::*;
 use mastermind::Color::*;
+use mastermind::*;
 use wasm_bindgen::prelude::*;
 
 // When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
@@ -13,7 +13,7 @@ use wasm_bindgen::prelude::*;
 static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
 
 #[wasm_bindgen]
-extern {
+extern "C" {
     fn alert(s: &str);
 }
 
@@ -34,10 +34,10 @@ pub fn greet() {
     match grade(&guess, &solution) {
         Grade::Correct => {
             alert("Guess was correct");
-        },
-        |Grade::Incorrect{..} => {
+        }
+        Grade::Incorrect { .. } => {
             alert("Incorrect guess");
-        },
+        }
         Grade::Invalid(_) => {
             alert("Invalid guess");
         }
