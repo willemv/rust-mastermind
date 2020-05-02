@@ -33,6 +33,9 @@ jobs:
         with:
           # Optional version of wasm-pack to install(eg. 'v0.9.1', 'latest')
           version: 'latest'
+      - uses: actions/setup-node@v1
+        with:
+          node-version: '13.x'
       - run: wasm-pack build -- --no-default-features
         working-directory: ./wasm/www
       - run: npm ci
