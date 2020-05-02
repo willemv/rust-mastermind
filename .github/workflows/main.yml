@@ -17,6 +17,24 @@ jobs:
         with:
           command: build
           args: --release
+  
+  www:
+    name: wasm-powered website
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          target: wasm32-unknown-unknown
+          override: true
+      - uses: jetli/wasm-pack-action@v0.3.0
+        with:
+          # Optional version of wasm-pack to install(eg. 'v0.9.1', 'latest')
+          version: 'latest'
+      - run: wasm-pack build -- --no-default-features
+        working-directory: ./wasm/www
 
   check:
     name: Check
