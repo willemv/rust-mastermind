@@ -2,11 +2,18 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <title>Hello wasm-pack!</title>
+    <title>Play Mastermind</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/mini.css/3.0.1/mini-default.min.css">
   </head>
   <body>
-    <button id="button_check">Check</button>
-    <button id="button_panic">Panic</button>
+    <main>
+    <button id="button_generate_secret">Reset</button>
+    <div id="results"></div>
+    <form id="check_form" method="GET">
+      <input id="guess" type="text" name="guess">
+      <input type="submit" value="Check">
+    </form>
+  </main>
     <noscript>This page contains webassembly and javascript content, please enable javascript in your browser.</noscript>
     <script src="./bootstrap.js"></script>
   </body>

@@ -24,7 +24,8 @@
   },
   "homepage": "https://github.com/willemv/rust-mastermind#readme",
   "dependencies": {
-    "mastermind-wasm": "file:../pkg"
+    "mastermind-wasm": "file:../pkg",
+    "shuffle-array": "^1.0.1"
   },
   "devDependencies": {
     "hello-wasm-pack": "^0.1.0",
