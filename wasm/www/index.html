@@ -1,20 +1,45 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="utf-8">
-    <title>Play Mastermind</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/mini.css/3.0.1/mini-default.min.css">
-  </head>
-  <body>
+
+<head>
+  <meta charset="utf-8">
+  <title>Mastermind</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/mini.css/3.0.1/mini-default.min.css">
+  <link rel="stylesheet" href="./index.css">
+</head>
+
+<body>
+  <section id="content">
+    <header><h1>MasterMind</h1></header>
     <main>
-    <button id="button_generate_secret">Reset</button>
-    <div id="results"></div>
-    <form id="check_form" method="GET">
-      <input id="guess" type="text" name="guess">
-      <input type="submit" value="Check">
-    </form>
-  </main>
-    <noscript>This page contains webassembly and javascript content, please enable javascript in your browser.</noscript>
-    <script src="./bootstrap.js"></script>
-  </body>
+      <button id="button_generate_secret">Reset</button>
+      <form id="check_form" method="GET">
+        <input id="guess" type="text" name="guess">
+        <input type="submit" value="Check">
+      </form>
+      <ul id="results">
+      </ul>
+    </main>
+  </section>
+  <noscript>This page contains webassembly and javascript content, please enable javascript in your browser.</noscript>
+  <script id="template_grade" type="text/x-simple-template">
+    <div class="grade">
+      <div class="guess">
+        <span class="peg" data-color="guess_1">guess_symbol_1</span>
+        <span class="peg" data-color="guess_2">guess_symbol_2</span>
+        <span class="peg" data-color="guess_3">guess_symbol_3</span>
+        <span class="peg" data-color="guess_4">guess_symbol_4</span>
+      </div>
+      <div class="result">
+        <span class="single_result" data-grade="grade_1">grade_symbol_1</span>
+        <span class="single_result" data-grade="grade_2">grade_symbol_2</span>
+        <span class="single_result" data-grade="grade_3">grade_symbol_3</span>
+        <span class="single_result" data-grade="grade_4">grade_symbol_4</span>
+      </div>
+    </div>
+  </script>
+  <script src="./bootstrap.js"></script>
+
+</body>
 </html>

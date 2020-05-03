@@ -33,7 +33,7 @@ pub fn grade(guess: String, solution: String) -> String {
 
     match (guess, solution) {
         (Ok(guess), Ok(solution)) => match mastermind::grade(&guess, &solution) {
-            Grade::Correct => "CORRECT".to_string(),
+            Grade::Correct => "XXXX".to_string(),
             Grade::Incorrect {
                 correct_position,
                 correct_color,

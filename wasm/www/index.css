@@ -1,0 +1,85 @@
+:root {
+  --back-color: lightgrey;
+}
+
+#content{
+    max-width: 700px;
+    margin: 20px auto 0;
+}
+header  {
+    text-align: center;
+}
+
+#results {
+    display: grid;
+    grid-gap: 0.3em;
+    padding: 0;
+    user-select: none;
+}
+
+.grade {
+    display: grid;
+    vertical-align: bottom;
+    grid-template: 
+        "guess result" auto /
+        10rem 6rem;
+}
+
+.grade .guess {
+    grid-area: guess;
+}
+.guess .peg {
+    display: inline-block;
+    border-radius: 1em;
+    width: 2em;
+    height: 2em;
+    color: transparent;
+}
+
+.guess .peg[data-color="red"]  {
+    background-color: red;
+}
+.guess .peg[data-color="green"]  {
+    background-color: green;
+}
+.guess .peg[data-color="yellow"]  {
+    background-color: yellow;
+}
+.guess .peg[data-color="blue"]  {
+    background-color: blue;
+}
+.guess .peg[data-color="cyan"]  {
+    background-color: cyan;
+}
+.guess .peg[data-color="purple"]  {
+    background-color: purple;
+}
+
+.grade .result {
+    grid-area: result;
+}
+
+.result .single_result {
+    display: inline-block;
+    border-radius: 0.5em;
+    width: 1em;
+    height: 1em;
+    color: transparent;
+    vertical-align: bottom;
+}
+
+.result .single_result[data-grade="correct_position"] {
+    background-color: black;
+}
+
+.result .single_result[data-grade="correct_color"] {
+    background-color: white;
+    border-color: black;
+    border-width: 2em;
+}
+.result .single_result[data-grade="wrong"] {
+    background-color: black;
+    border-radius: 0.1em;
+    width: 0.2em;
+    height: 0.2em;
+}
