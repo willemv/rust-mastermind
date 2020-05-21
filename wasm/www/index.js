@@ -1,5 +1,6 @@
 import * as wasm from "mastermind-wasm";
 import * as shuffle from "shuffle-array";
+import * as templ from "./microtemplating";
 
 wasm.init();
 
@@ -13,14 +14,48 @@ let secret = generate_secret();
 
 let results = document.getElementById("results");
 
-let grade_template = document.getElementById("template_grade").innerHTML;
-
 document.getElementById("button_generate_secret").onclick = function (event) {
     secret = generate_secret();
     console.log(secret);
     while (results.hasChildNodes()) {
         results.removeChild(results.firstChild);
     }
+}
+
+function symbol_to_color(symbol) {
+    
+    if (symbol == "R") {
+        return "red";
+    }
+    if (symbol == "G") {
+        return "green";
+    }
+    if (symbol == "Y") {
+        return "yellow";
+    }
+    if (symbol == "B") {
+        return "blue";
+    }
+    if (symbol == "C") {
+        return "cyan";
+    }
+    if (symbol == "P") {
+        return "purple";
+    }
+    throw new Error("Unknown symbol: " + symbol);
+}
+
+function grade_to_class(grade) {
+    if (grade == "X") {
+        return "correct_position";
+    }
+    if (grade == "O") {
+        return "correct_color";
+    }
+    if (grade == ".") {
+        return "wrong";
+    }
+    throw new Error("Uknown grade: " + grade);
 }
 
 function check(guess) {
@@ -30,58 +65,24 @@ function check(guess) {
         console.error(grade);
         return false;
     }
-    console.log(grade);
 
-    let filled_grade_template = grade_template;
-    for (let i = 1; i < 5; i++) {
-        let guess_color = (guess.charAt(i - 1));
-        filled_grade_template = filled_grade_template.replace("guess_symbol_" + i, guess_color);
-        if (guess_color == "R") {
-            filled_grade_template = filled_grade_template.replace("guess_" + i, "red");
-        }
-        if (guess_color == "G") {
-            filled_grade_template = filled_grade_template.replace("guess_" + i, "green");
-        }
-        if (guess_color == "Y") {
-            filled_grade_template = filled_grade_template.replace("guess_" + i, "yellow");
-        }
-        if (guess_color == "B") {
-            filled_grade_template = filled_grade_template.replace("guess_" + i, "blue");
-        }
-        if (guess_color == "C") {
-            filled_grade_template = filled_grade_template.replace("guess_" + i, "cyan");
-        }
-        if (guess_color == "P") {
-            filled_grade_template = filled_grade_template.replace("guess_" + i, "purple");
-        }
-    }
-
-    for (let i = 1; i < 5; i++) {
-        let grade_result = grade.charAt(i-1);
-        filled_grade_template.replace("grade_symbol_" + i, grade_result);
-        if (grade_result == "X") {
-            filled_grade_template = filled_grade_template.replace("grade_" + i, "correct_position");
-        }
-        if (grade_result == "O") {
-            filled_grade_template = filled_grade_template.replace("grade_" + i, "correct_color");
-        }
-        if (grade_result == ".") {
-            filled_grade_template = filled_grade_template.replace("grade_" + i, "wrong");
-        }
-    }
-
-
-    console.log(filled_grade_template);
-    results.innerHTML = results.innerHTML + filled_grade_template;
+    let template_data = {
+        guess: guess.split('').map(symbol => {return {color: symbol_to_color(symbol), symbol: symbol}}),
+        result: grade.split('').map(grade => {return {symbol: grade, grade: grade_to_class(grade)}}),
+    };
+    results.innerHTML = results.innerHTML + templ.tmpl("template_grade", template_data);
     return true;
-
 }
 
 document.getElementById("check_form").onsubmit = function (event) {
     let guess = this.guess.value;
-    let check_valid = check(guess);
-    if (check_valid) {
-        this.guess.value = "";
+    try{
+        let check_valid = check(guess);
+        if (check_valid) {
+            this.guess.value = "";
+        }
+    } catch (error) {
+        console.log(error);
     }
     event.preventDefault();
     return true;
