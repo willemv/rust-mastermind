@@ -10,7 +10,7 @@ header  {
     text-align: center;
 }
 
-#results {
+.peg, .result_peg {
     display: grid;
     grid-gap: 0.3em;
     padding: 0;
@@ -28,7 +28,8 @@ header  {
 .grade .guess {
     grid-area: guess;
 }
-.guess .peg {
+
+.peg {
     display: inline-block;
     border-radius: 1em;
     width: 2em;
@@ -36,30 +37,36 @@ header  {
     color: transparent;
 }
 
-.guess .peg[data-color="red"]  {
+.peg[data-color="red"]  {
     background-color: red;
 }
-.guess .peg[data-color="green"]  {
+.peg[data-color="green"]  {
     background-color: green;
 }
-.guess .peg[data-color="yellow"]  {
+.peg[data-color="yellow"]  {
     background-color: yellow;
 }
-.guess .peg[data-color="blue"]  {
+.peg[data-color="blue"]  {
     background-color: blue;
 }
-.guess .peg[data-color="cyan"]  {
+.peg[data-color="cyan"]  {
     background-color: cyan;
 }
-.guess .peg[data-color="purple"]  {
+.peg[data-color="purple"]  {
     background-color: purple;
 }
+.peg:not([data-color]) {
+    background-color: lightgray;
+}
 
+.grade {
+    margin: 0.5em;
+}
 .grade .result {
     grid-area: result;
 }
 
-.result .single_result {
+.result_peg {
     display: inline-block;
     border-radius: 0.5em;
     width: 1em;
@@ -68,16 +75,16 @@ header  {
     vertical-align: bottom;
 }
 
-.result .single_result[data-grade="correct_position"] {
+.result_peg[data-grade="correct_position"] {
     background-color: black;
 }
 
-.result .single_result[data-grade="correct_color"] {
+.result_peg[data-grade="correct_color"] {
     background-color: white;
     border-color: black;
     border-width: 2em;
 }
-.result .single_result[data-grade="wrong"] {
+.result_peg[data-grade="wrong"] {
     background-color: black;
     border-radius: 0.1em;
     width: 0.2em;

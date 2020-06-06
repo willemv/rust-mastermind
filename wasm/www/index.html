@@ -14,12 +14,18 @@
     <header><h1>MasterMind</h1></header>
     <main>
       <button id="button_generate_secret">Reset</button>
-      <form id="check_form" method="GET">
-        <input id="guess" type="text" name="guess">
-        <input type="submit" value="Check">
-      </form>
       <ul id="results">
       </ul>
+      <form id="guess_form" method="GET">
+        <div id="guess_input">
+          <span class="peg"  id="guess_input_1">1</span>
+          <span class="peg"  id="guess_input_2">2</span>
+          <span class="peg"  id="guess_input_3">3</span>
+          <span class="peg"  id="guess_input_4">4</span>
+        </div>
+        <input type="submit" value="Check">
+      </form>
+
     </main>
   </section>
   <noscript>This page contains webassembly and javascript content, please enable javascript in your browser.</noscript>
@@ -32,7 +38,7 @@
       </div>
       <div class="result">
         <% result.forEach(function(it) { %>
-          <span class="single_result" data-grade="<%= it.grade %>"><%= it.symbol %></span>
+          <span class="result_peg" data-grade="<%= it.grade %>"><%= it.symbol %></span>
         <% }); %>
       </div>
     </div>
