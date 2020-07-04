@@ -5,7 +5,11 @@
   <meta charset="utf-8">
   <title>Mastermind</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/mini.css/3.0.1/mini-default.min.css">
+
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300italic,700,700italic">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.css">
+
+  <link rel="stylesheet" href="./milligram.css">
   <link rel="stylesheet" href="./index.css">
 </head>
 
@@ -21,9 +25,7 @@
   <section id="content">
     <header><h1>MasterMind</h1></header>
     <main>
-      <button id="button_generate_secret">Reset</button>
-      <ul id="results">
-      </ul>
+      <div id="results"></div>
       <form id="guess_form" method="GET">
         <div id="guess_input">
           <span class="peg"  id="guess_input_1">1</span>
@@ -33,7 +35,7 @@
         </div>
         <input type="submit" value="Check">
       </form>
-
+      <button id="button_new_game">New game</button>
     </main>
   </section>
   <noscript>This page contains webassembly and javascript content, please enable javascript in your browser.</noscript>

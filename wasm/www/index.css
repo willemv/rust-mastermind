@@ -3,7 +3,33 @@
   --number-of-colors: 6;
   --color-chooser-size: 4.5em;
   --color-chooser-spans-size: 2em;
-  --color-chooser-step: calc(360deg / var(--number-of-colors))
+  --color-chooser-step: calc(360deg / var(--number-of-colors));
+  --highlight-color: #ff9940;
+
+  --color-red: rgb(255, 77, 77);
+  --color-green: rgb(77, 255, 77);
+  --color-yellow: rgb(255, 255, 77);
+  --color-blue: rgb(77, 77, 255);
+  --color-cyan: cyan;
+  --color-purple: rgb(168, 98, 234);
+  --color-lightgray: lightgray;
+}
+
+header h1 {
+    border-bottom: 1px var(--highlight-color) solid;
+}
+
+body {
+    padding: 0 3em 0 3em;
+}
+
+#content {
+    width: 24em;
+}
+
+.button, button, input[type=submit] {
+    background-color: var(--highlight-color);
+    border-color: var(--highlight-color);
 }
 
 #color_chooser{
@@ -28,7 +54,6 @@
     position: absolute;
     top: 50%; left: 50%;
     margin: calc((var(--color-chooser-spans-size) / -2));
-    opacity: 50%;
 }
  
 #color_chooser span:nth-of-type(1) { transform: rotate(calc(var(--color-chooser-step) * (1 - 1))) translate(calc(var(--color-chooser-size) / 2)) rotate(calc(var(--color-chooser-step) * -1 * (1 - 1))); }
@@ -39,22 +64,22 @@
 #color_chooser span:nth-of-type(6) { transform: rotate(calc(var(--color-chooser-step) * (6 - 1))) translate(calc(var(--color-chooser-size) / 2)) rotate(calc(var(--color-chooser-step) * -1 * (6 - 1))); }
 
 #color_chooser span[data-color="red"]  {
-    background-color: red;
+    background-color: var(--color-red);
 }
 #color_chooser span[data-color="green"]  {
-    background-color: green;
+    background-color: var(--color-green);
 }
 #color_chooser span[data-color="yellow"]  {
-    background-color: yellow;
+    background-color: var(--color-yellow);
 }
 #color_chooser span[data-color="blue"]  {
-    background-color: blue;
+    background-color: var(--color-blue);
 }
 #color_chooser span[data-color="cyan"]  {
-    background-color: cyan;
+    background-color: var(--color-cyan);
 }
 #color_chooser span[data-color="purple"]  {
-    background-color: purple;
+    background-color: var(--color-purple);
 }
 
 #content{
@@ -67,21 +92,31 @@ header  {
 
 .peg, .result_peg {
     display: grid;
-    grid-gap: 0.3em;
-    padding: 0;
     user-select: none;
 }
 
 .grade {
     display: grid;
-    vertical-align: bottom;
-    grid-template: 
+    grid-template:
         "guess result" auto /
-        10rem 6rem;
+        max-content auto;
+    column-gap: 1em;
+}
+
+.result {
+    background-color: #b0b8bf;
+    font-size: 1.1rem;
+    border-radius: 0.4em;
+    height: 3.8rem;
+}
+
+.grade {
+  vertical-align: middle;
 }
 
 .grade .guess {
     grid-area: guess;
+    display: flex;
 }
 
 .peg {
@@ -90,44 +125,56 @@ header  {
     width: 2em;
     height: 2em;
     color: transparent;
+    margin: auto 0.2em auto 0.2em;
 }
 
 .peg[data-color="red"]  {
-    background-color: red;
+    background-color: var(--color-red);
 }
 .peg[data-color="green"]  {
-    background-color: green;
+    background-color: var(--color-green);
 }
 .peg[data-color="yellow"]  {
-    background-color: yellow;
+    background-color: var(--color-yellow);
 }
 .peg[data-color="blue"]  {
-    background-color: blue;
+    background-color: var(--color-blue);
 }
 .peg[data-color="cyan"]  {
-    background-color: cyan;
+    background-color: var(--color-cyan);
 }
 .peg[data-color="purple"]  {
-    background-color: purple;
+    background-color: var(--color-purple);
 }
 .peg:not([data-color]) {
-    background-color: lightgray;
+    background-color: var(--color-lightgray);
 }
 
-.grade {
-    margin: 0.5em;
+#guess_input {
+  grid-area: guess;
+  display: flex;
 }
+
+.grade, #guess_input {
+    margin: 0.2em 0 0.2em 0;
+}
+
 .grade .result {
-    grid-area: result;
+  display: flex;
+}
+
+.result {
+    padding: 0 0.5em 0 0.5em;
 }
 
 .result_peg {
     display: inline-block;
-    border-radius: 0.5em;
-    width: 1em;
-    height: 1em;
+    border-radius: 0.8em;
+    width: 1.6em;
+    height: 1.6em;
     color: transparent;
-    vertical-align: bottom;
+    vertical-align: middle;
+    margin: auto 0.2em auto 0.2em;
 }
 
 .result_peg[data-grade="correct_position"] {
@@ -139,9 +186,28 @@ header  {
     border-color: black;
     border-width: 2em;
 }
+
 .result_peg[data-grade="wrong"] {
     background-color: black;
-    border-radius: 0.1em;
-    width: 0.2em;
-    height: 0.2em;
+    border-radius: 0.2em;
+    width: 0.4em;
+    height: 0.4em;
+}
+
+#guess_form {
+    margin: 0.2em 0 0.5em 0;
+    /* height: 3.8em; */
+    display: grid;
+    grid-template:
+        "guess check" auto /
+        max-content auto;
+    column-gap: 1em;
+}
+
+#guess_form input {
+    grid-area: check;
+}
+
+#button_new_game {
+    width: 100%;
 }

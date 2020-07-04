@@ -15,7 +15,7 @@ let secret = generate_secret();
 
 let results = document.getElementById("results");
 
-document.getElementById("button_generate_secret").addEventListener("click", event => {
+document.getElementById("button_new_game").addEventListener("click", event => {
     secret = generate_secret();
     console.log(secret);
     while (results.hasChildNodes()) {
