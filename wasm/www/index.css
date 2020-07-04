@@ -20,11 +20,17 @@ header h1 {
 }
 
 body {
-    padding: 0 3em 0 3em;
+    padding: 0 2em 0 2em;
+    min-width: 300px;
+    display: flex;
+    justify-content: center;
+    align-items: stretch;
 }
 
 #content {
-    width: 24em;
+    flex-grow: 1;
+    max-width: 24em;
+    min-width: 18em;
 }
 
 .button, button, input[type=submit] {
@@ -82,10 +88,6 @@ body {
     background-color: var(--color-purple);
 }
 
-#content{
-    max-width: 700px;
-    margin: 20px auto 0;
-}
 header  {
     text-align: center;
 }
@@ -210,4 +212,5 @@ header  {
 
 #button_new_game {
     width: 100%;
+    margin-top: 3em;
 }
