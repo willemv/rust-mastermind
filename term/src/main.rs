@@ -8,6 +8,8 @@ use rand::prelude::*;
 use rand::seq::SliceRandom;
 use std::io;
 
+use mastermind::gameloop::*;
+
 static ALL_COLORS: [Color; 6] = [
     Color {
         name: 'R',
@@ -106,7 +108,7 @@ fn main() {
     let same_color = matches.is_present("same_color");
     let max_attempts = matches
         .value_of("max_attempts")
-        .and_then(|s| s.parse::<u32>().ok())
+        .and_then(|s| s.parse::<usize>().ok())
         .unwrap_or(12);
 
     let mut t = stdout().unwrap();
@@ -118,55 +120,62 @@ fn main() {
         print_colors(&secret, &mut t);
         println!();
     }
-    let mut guess_count = 0;
+    let secret_colors = secret.iter().map(|c| c.color).collect::<Vec<mastermind::Color>>();
+    let mut game = mastermind::gameloop::start(&secret_colors, max_attempts);
     loop {
-        println!("Enter your guess (attempt {} of {}): ", guess_count + 1, max_attempts);
+        println!(
+            "Enter your guess (attempt {} of {}): ",
+            game.guess_count() + 1,
+            game.max_attempts
+        );
         match read_guess(secret.len()) {
             Ok(guessed_colors) => {
                 erase_guess_from_terminal(&mut t).unwrap();
                 print_colors(&guessed_colors, &mut t);
                 let core_colors: Vec<mastermind::Color> = guessed_colors.iter().map(|c| c.color).collect();
-                let core_secret: Vec<mastermind::Color> = secret.iter().map(|c| c.color).collect();
-                match mastermind::grade(&core_colors, &core_secret) {
-                    mastermind::Grade::Invalid(message) => {
+
+                game = mastermind::gameloop::attempt(game, core_colors);
+                match game.state {
+                    State::AwaitingAttempt(false) => {
                         println!();
-                        println!("Invalid guess: {}", message);
+                        println!("Invalid guess");
                     }
-                    mastermind::Grade::Correct => {
+                    State::AwaitingAttempt(true) => {
+                        let a: Attempt = game.attempts.last().unwrap().clone();
+                        let grade = a.grade;
+                        if let mastermind::Grade::Incorrect {
+                            correct_position,
+                            correct_color,
+                            wrong,
+                        } = grade
+                        {
+                            print!("     ");
+                            for _ in 0..correct_position {
+                                print!("X ");
+                            }
+                            for _ in 0..correct_color {
+                                print!("O ");
+                            }
+                            for _ in 0..wrong {
+                                print!(". ");
+                            }
+                            println!();
+                        }
+                    }
+                    State::Finished(true) => {
                         println!();
                         println!("Congratulations, you got the correct colors!");
                         print_colors(&secret, &mut t);
                         println!();
                         break;
                     }
-                    mastermind::Grade::Incorrect {
-                        correct_position,
-                        correct_color,
-                        wrong,
-                    } => {
-                        guess_count += 1;
-
-                        print!("     ");
-                        for _ in 0..correct_position {
-                            print!("X ");
-                        }
-                        for _ in 0..correct_color {
-                            print!("O ");
-                        }
-                        for _ in 0..wrong {
-                            print!(". ");
-                        }
+                    State::Finished(false) => {
                         println!();
-                        if guess_count < max_attempts {
-                            continue;
-                        } else {
-                            println!();
-                            println!("Too bad, better luck next time!");
-                            println!("The secret was:");
-                            print_colors(&secret, &mut t);
-                            println!();
-                            break;
-                        }
+                        println!("Too bad, better luck next time!");
+                        println!("The secret was:");
+                        print_colors(&secret, &mut t);
+                        println!();
+                        break;
                     }
                 }
             }
