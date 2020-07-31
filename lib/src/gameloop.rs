@@ -90,6 +90,7 @@ mod test {
         let game = start(&[RED, YELLOW, GREEN, BLUE], 6);
         let result = attempt(&game, vec![RED, YELLOW, GREEN, BLUE]);
         assert!(matches!(result.state, State::Finished(true)));
+        assert!(game.attempts.is_empty());
     }
 
     #[test]
@@ -98,7 +99,6 @@ mod test {
         let state = attempt(&state, vec![RED, PURPLE, GREEN, BLUE]);
 
         assert!(matches!(state.state, State::AwaitingAttempt(true)));
-
         assert!(state.attempts.len() == 1);
     }
 }
