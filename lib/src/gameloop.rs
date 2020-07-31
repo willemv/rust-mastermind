@@ -36,7 +36,7 @@ impl GameState {
             secret: self.secret,
             max_attempts: self.max_attempts,
             attempts: clone_and_append(self.attempts, attempt),
-            state: state,
+            state,
         }
     }
 
@@ -44,8 +44,8 @@ impl GameState {
         GameState {
             secret: self.secret,
             max_attempts: self.max_attempts,
-            attempts: self.attempts.clone(),
-            state: state,
+            attempts: self.attempts,
+            state,
         }
     }
 
@@ -75,7 +75,7 @@ pub fn attempt(current_state: GameState, guess: Vec<Color>) -> GameState {
 }
 
 fn clone_and_append(attempts: Vec<Attempt>, attempt: Attempt) -> Vec<Attempt> {
-    let mut new_attempts = Vec::from(attempts.clone());
+    let mut new_attempts = attempts;
     new_attempts.push(attempt);
     new_attempts
 }
