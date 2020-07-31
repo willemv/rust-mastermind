@@ -31,20 +31,20 @@ pub fn start(secret: &[Color], max_attempts: usize) -> GameState {
 }
 
 impl GameState {
-    fn for_attempt(self, attempt: Attempt, state: State) -> GameState {
+    fn for_attempt(&self, attempt: Attempt, state: State) -> GameState {
         GameState {
-            secret: self.secret,
+            secret: self.secret.clone(),
             max_attempts: self.max_attempts,
-            attempts: clone_and_append(self.attempts, attempt),
+            attempts: clone_and_append(&self.attempts, attempt),
             state,
         }
     }
 
-    fn with_state(self, state: State) -> GameState {
+    fn with_state(&self, state: State) -> GameState {
         GameState {
-            secret: self.secret,
+            secret: self.secret.clone(),
             max_attempts: self.max_attempts,
-            attempts: self.attempts,
+            attempts: self.attempts.clone(),
             state,
         }
     }
@@ -54,7 +54,7 @@ impl GameState {
     }
 }
 
-pub fn attempt(current_state: GameState, guess: Vec<Color>) -> GameState {
+pub fn attempt(current_state: &GameState, guess: Vec<Color>) -> GameState {
     let grade = grade(&guess, &current_state.secret);
     match grade {
         Grade::Correct => current_state.for_attempt(Attempt { guess, grade }, State::Finished(true)),
@@ -74,7 +74,8 @@ pub fn attempt(current_state: GameState, guess: Vec<Color>) -> GameState {
     }
 }
 
-fn clone_and_append(mut attempts: Vec<Attempt>, attempt: Attempt) -> Vec<Attempt> {
+fn clone_and_append(attempts: &Vec<Attempt>, attempt: Attempt) -> Vec<Attempt> {
+    let mut attempts = attempts.clone();
     attempts.push(attempt);
     attempts
 }
@@ -87,14 +88,14 @@ mod test {
     #[test]
     fn test_correct_attempt() {
         let game = start(&[RED, YELLOW, GREEN, BLUE], 6);
-        let result = attempt(game, vec![RED, YELLOW, GREEN, BLUE]);
+        let result = attempt(&game, vec![RED, YELLOW, GREEN, BLUE]);
         assert!(matches!(result.state, State::Finished(true)));
     }
 
     #[test]
     fn happy_path() {
         let state = start(&[RED, YELLOW, GREEN, BLUE], 4);
-        let state = attempt(state, vec![RED, PURPLE, GREEN, BLUE]);
+        let state = attempt(&state, vec![RED, PURPLE, GREEN, BLUE]);
 
         assert!(matches!(state.state, State::AwaitingAttempt(true)));
 

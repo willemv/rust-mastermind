@@ -134,7 +134,7 @@ fn main() {
                 print_colors(&guessed_colors, &mut t);
                 let core_colors: Vec<mastermind::Color> = guessed_colors.iter().map(|c| c.color).collect();
 
-                game = mastermind::gameloop::attempt(game, core_colors);
+                game = mastermind::gameloop::attempt(&game, core_colors);
                 match game.state {
                     State::AwaitingAttempt(false) => {
                         println!();
