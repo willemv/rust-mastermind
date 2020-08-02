@@ -74,8 +74,8 @@ pub fn attempt(current_state: &GameState, guess: Vec<Color>) -> GameState {
     }
 }
 
-fn clone_and_append(attempts: &Vec<Attempt>, attempt: Attempt) -> Vec<Attempt> {
-    let mut attempts = attempts.clone();
+fn clone_and_append(attempts: &[Attempt], attempt: Attempt) -> Vec<Attempt> {
+    let mut attempts = Vec::from(attempts);
     attempts.push(attempt);
     attempts
 }
