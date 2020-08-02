@@ -4,8 +4,10 @@
   "description": "create an app to consume rust-generated wasm packages",
   "main": "index.js",
   "scripts": {
+    "rust-dev" : "cd ../.. && cargo watch -s \"cd wasm && wasm-pack build\"",
+    "webpack-dev": "webpack-dev-server",
+    "dev" : "concurrently --kill-others \"npm run rust-dev\" \"npm run webpack-dev\"",
     "build": "webpack --config webpack.config.js",
-    "start": "webpack-dev-server",
     "simple": "webpack-dev-server --no-live-reload"
   },
   "repository": {
