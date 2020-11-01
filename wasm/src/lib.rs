@@ -153,13 +153,13 @@ fn setup(doc: &Document) {
 
 fn guess_to_string(guess: &[Color]) -> String {
     guess.iter().fold(String::new(), |mut string, color| {
-        string.push(match color {
-            &Color::RED => 'R',
-            &Color::GREEN => 'G',
-            &Color::BLUE => 'B',
-            &Color::YELLOW => 'Y',
-            &Color::CYAN => 'C',
-            &Color::PURPLE => 'P',
+        string.push(match *color {
+            Color::RED => 'R',
+            Color::GREEN => 'G',
+            Color::BLUE => 'B',
+            Color::YELLOW => 'Y',
+            Color::CYAN => 'C',
+            Color::PURPLE => 'P',
         });
         string
     })
