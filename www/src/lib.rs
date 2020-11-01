@@ -2,48 +2,21 @@ extern crate js_sys;
 extern crate mastermind;
 extern crate web_sys;
 
+#[macro_use]
+mod js_utils;
 mod utils;
 
+use js_utils::*;
 use mastermind::*;
 use wasm_bindgen::prelude::*;
-
 use wasm_bindgen::JsCast;
-
-use web_sys::{
-    // AddEventListenerOptions,
-    // Blob,
-    console,
-    // FileReader,
-    Document,
-    Element,
-    // Event,
-    EventTarget,
-    // KeyboardEvent,
-    // HtmlButtonElement,
-    HtmlElement,
-    // HtmlInputElement,
-    // MessageEvent,
-    NodeList,
-    // PointerEvent,
-    // ProgressEvent,
-};
+use web_sys::{Document, Element, HtmlElement, NodeList};
 
 // When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
 // allocator.
 #[cfg(feature = "wee_alloc")]
 #[global_allocator]
 static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
-
-#[allow(unused_unsafe)]
-//this is for the benefit or rust-analyzer, who marks all usages of the regular log_1 as unsafe
-fn log_1(data_1: &::wasm_bindgen::JsValue) {
-    unsafe {
-        console::log_1(data_1);
-    }
-}
-macro_rules! console_log {
-    ($($t:tt)*) => (log_1(&format!($($t)*).into()))
-}
 
 #[wasm_bindgen]
 pub fn init(doc: &Document) {
@@ -76,23 +49,6 @@ fn display_grade(grade: &str, guess: &str) {
     unsafe {
         _display_grade(grade, guess);
     }
-}
-
-fn add_callback<T, F>(target: &T, event: &str, f: F) -> Closure<dyn Fn(web_sys::Event)>
-where
-    T: JsCast,
-    F: Fn(web_sys::Event) + 'static,
-{
-    let closure = Closure::wrap(Box::new(f) as Box<dyn Fn(web_sys::Event)>);
-
-    let target = target
-        .dyn_ref::<EventTarget>()
-        .expect("target should be an EventTarget");
-
-    target
-        .add_event_listener_with_callback(event, closure.as_ref().unchecked_ref())
-        .expect("callback registration should work");
-    closure
 }
 
 fn setup(doc: &Document) {
@@ -192,39 +148,6 @@ fn grade_to_string(grade: &Grade) -> String {
 #[wasm_bindgen]
 pub fn trigger_panic() {
     panic!("Testing panic in consoles: {}", "test formatting");
-}
-
-#[wasm_bindgen]
-pub fn grade(guess: String, solution: String) -> String {
-    let guess = parse_colors(&guess);
-    let solution = parse_colors(&solution);
-
-    match (guess, solution) {
-        (Ok(guess), Ok(solution)) => match mastermind::grade(&guess, &solution) {
-            Grade::Correct => "XXXX".to_string(),
-            Grade::Incorrect {
-                correct_position,
-                correct_color,
-                wrong,
-            } => {
-                let mut result = String::with_capacity(guess.len());
-                for _ in 0..correct_position {
-                    result.push('X');
-                }
-                for _ in 0..correct_color {
-                    result.push('O');
-                }
-                for _ in 0..wrong {
-                    result.push('.');
-                }
-                result
-            }
-            Grade::Invalid(_) => "INVALID".to_string(),
-        },
-        (Ok(_), Err(_)) => "PARSE_ERROR GUESS".to_string(),
-        (Err(_), Ok(_)) => "PARSE_ERROR SOLUTION".to_string(),
-        (Err(_), Err(_)) => "PARSE_ERROR_GUESS_AND_SOLUTION".to_string(),
-    }
 }
 
 fn parse_colors(string: &str) -> Result<Vec<Color>, &str> {
