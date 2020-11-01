@@ -52,13 +52,13 @@ pub fn init(doc: &Document) {
     setup(doc);
 }
 
-#[wasm_bindgen(raw_module = "../www/state")]
+#[wasm_bindgen(raw_module = "../state")]
 extern "C" {
     #[wasm_bindgen(js_name = get_secret)]
     fn _get_secret() -> String;
 }
 
-#[wasm_bindgen(raw_module = "../www/view")]
+#[wasm_bindgen(raw_module = "../view")]
 extern "C" {
     #[wasm_bindgen(js_name = display_grade)]
     fn _display_grade(grade: &str, guess: &str);
