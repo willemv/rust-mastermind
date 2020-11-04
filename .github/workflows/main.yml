@@ -36,6 +36,8 @@ jobs:
       - uses: actions/setup-node@v1
         with:
           node-version: '13.x'
+      - run: wasm-pack build --out-dir mastermind-wasm -- --no-default-features
+        working-directory: ./www
       - run: npm ci
         working-directory: ./www
       - run: npm run build
