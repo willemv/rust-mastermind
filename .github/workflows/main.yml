@@ -36,16 +36,14 @@ jobs:
       - uses: actions/setup-node@v1
         with:
           node-version: '13.x'
-      - run: wasm-pack build -- --no-default-features
-        working-directory: ./wasm/www
       - run: npm ci
-        working-directory: ./wasm/www
+        working-directory: ./www
       - run: npm run build
-        working-directory: ./wasm/www
+        working-directory: ./www
       - name: Deploy to Netlify
         uses: nwtgck/actions-netlify@v1.0
         with:
-          publish-dir: './wasm/www/dist'
+          publish-dir: './www/dist'
           production-branch: master
           github-token: ${{ secrets.GITHUB_TOKEN }}
           deploy-message: "Deploy from GitHub Actions"
