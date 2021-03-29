@@ -60,6 +60,7 @@ body {
     position: absolute;
     top: 50%; left: 50%;
     margin: calc((var(--color-chooser-spans-size) / -2));
+    box-shadow: 0px 0px 10px #888;
 }
 
 #color_chooser span:nth-of-type(1) { transform: rotate(calc(var(--color-chooser-step) * (1 - 1))) translate(calc(var(--color-chooser-size) / 2)) rotate(calc(var(--color-chooser-step) * -1 * (1 - 1))); }
