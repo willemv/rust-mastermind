@@ -54,8 +54,6 @@ fn setup(doc: &Document) {
         .query_selector_all(".peg")
         .expect("could not find guess pegs");
 
-    console_log!("[RUST] I have found {} pegs", guess_pegs.length());
-
     let cb = add_callback(&guess_form, "submit", move |event| {
         console_log!("[RUST] clicked guess button, event {:?}", event);
 
