@@ -163,7 +163,7 @@ fn main() {
                         }
                     }
                     State::Finished(true) => {
-                        println!();
+                        println!("     X X X X");
                         println!("Congratulations, you got the correct colors!");
                         print_colors(&secret, &mut t);
                         println!();
