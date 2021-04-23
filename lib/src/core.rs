@@ -1,11 +1,11 @@
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum Color {
-    RED,
-    GREEN,
-    YELLOW,
-    BLUE,
-    CYAN,
-    PURPLE,
+    Red,
+    Green,
+    Yellow,
+    Blue,
+    Cyan,
+    Purple,
 }
 
 #[derive(Debug, Clone)]
@@ -62,7 +62,7 @@ mod test {
     #[test]
     fn grade_correct() {
         assert!(matches!(
-            grade(&vec![RED, YELLOW, GREEN, BLUE], &vec![RED, YELLOW, GREEN, BLUE]),
+            grade(&vec![Red, Yellow, Green, Blue], &vec![Red, Yellow, Green, Blue]),
             Grade::Correct
         ));
     }
@@ -70,7 +70,7 @@ mod test {
     #[test]
     fn grade_incorrect() {
         assert!(matches!(
-            grade(&vec![RED, YELLOW, GREEN, BLUE], &vec![RED, YELLOW, GREEN, PURPLE]),
+            grade(&vec![Red, Yellow, Green, Blue], &vec![Red, Yellow, Green, Purple]),
             Grade::Incorrect {
                 correct_position: 3,
                 correct_color: 0,
@@ -82,7 +82,7 @@ mod test {
     #[test]
     fn grade_same_colors_1() {
         assert!(matches!(
-            grade(&vec![RED, RED, GREEN, GREEN], &vec![RED, RED, RED, GREEN]),
+            grade(&vec![Red, Red, Green, Green], &vec![Red, Red, Red, Green]),
             Grade::Incorrect {
                 correct_position: 3,
                 correct_color: 1,
@@ -94,7 +94,7 @@ mod test {
     #[test]
     fn grade_same_colors_2() {
         assert!(matches!(
-            grade(&vec![RED, RED, GREEN, GREEN], &vec![RED, RED, RED, GREEN]),
+            grade(&vec![Red, Red, Green, Green], &vec![Red, Red, Red, Green]),
             Grade::Incorrect {
                 correct_position: 3,
                 correct_color: 1,
@@ -106,7 +106,7 @@ mod test {
     #[test]
     fn grade_same_colors_3() {
         assert!(matches!(
-            grade(&vec![RED, RED, GREEN, GREEN], &vec![GREEN, RED, RED, YELLOW]),
+            grade(&vec![Red, Red, Green, Green], &vec![Green, Red, Red, Yellow]),
             Grade::Incorrect {
                 correct_position: 1,
                 correct_color: 2,

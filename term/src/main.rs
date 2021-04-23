@@ -13,32 +13,32 @@ use mastermind::gameloop::*;
 static ALL_COLORS: [Color; 6] = [
     Color {
         name: 'R',
-        color: mastermind::Color::RED,
+        color: mastermind::Color::Red,
         term_color: term::color::RED,
     },
     Color {
         name: 'G',
-        color: mastermind::Color::GREEN,
+        color: mastermind::Color::Green,
         term_color: term::color::GREEN,
     },
     Color {
         name: 'Y',
-        color: mastermind::Color::YELLOW,
+        color: mastermind::Color::Yellow,
         term_color: term::color::YELLOW,
     },
     Color {
         name: 'B',
-        color: mastermind::Color::BLUE,
+        color: mastermind::Color::Blue,
         term_color: term::color::BLUE,
     },
     Color {
         name: 'C',
-        color: mastermind::Color::CYAN,
+        color: mastermind::Color::Cyan,
         term_color: term::color::CYAN,
     },
     Color {
         name: 'P',
-        color: mastermind::Color::PURPLE,
+        color: mastermind::Color::Purple,
         term_color: term::color::MAGENTA,
     },
 ];

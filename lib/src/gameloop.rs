@@ -87,16 +87,16 @@ mod test {
 
     #[test]
     fn test_correct_attempt() {
-        let game = start(&[RED, YELLOW, GREEN, BLUE], 6);
-        let result = attempt(&game, vec![RED, YELLOW, GREEN, BLUE]);
+        let game = start(&[Red, Yellow, Green, Blue], 6);
+        let result = attempt(&game, vec![Red, Yellow, Green, Blue]);
         assert!(matches!(result.state, State::Finished(true)));
         assert!(game.attempts.is_empty());
     }
 
     #[test]
     fn happy_path() {
-        let state = start(&[RED, YELLOW, GREEN, BLUE], 4);
-        let state = attempt(&state, vec![RED, PURPLE, GREEN, BLUE]);
+        let state = start(&[Red, Yellow, Green, Blue], 4);
+        let state = attempt(&state, vec![Red, Purple, Green, Blue]);
 
         assert!(matches!(state.state, State::AwaitingAttempt(true)));
         assert!(state.attempts.len() == 1);

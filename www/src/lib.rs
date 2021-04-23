@@ -105,12 +105,12 @@ fn setup(doc: &Document) {
 fn guess_to_string(guess: &[Color]) -> String {
     guess.iter().fold(String::new(), |mut string, color| {
         string.push(match *color {
-            Color::RED => 'R',
-            Color::GREEN => 'G',
-            Color::BLUE => 'B',
-            Color::YELLOW => 'Y',
-            Color::CYAN => 'C',
-            Color::PURPLE => 'P',
+            Color::Red => 'R',
+            Color::Green => 'G',
+            Color::Blue => 'B',
+            Color::Yellow => 'Y',
+            Color::Cyan => 'C',
+            Color::Purple => 'P',
         });
         string
     })
@@ -149,12 +149,12 @@ fn parse_colors(string: &str) -> Result<Vec<Color>, &str> {
     let mut result = Vec::with_capacity(string.len());
     for char in string.chars() {
         match char {
-            'R' => result.push(Color::RED),
-            'Y' => result.push(Color::YELLOW),
-            'G' => result.push(Color::GREEN),
-            'B' => result.push(Color::BLUE),
-            'C' => result.push(Color::CYAN),
-            'P' => result.push(Color::PURPLE),
+            'R' => result.push(Color::Red),
+            'Y' => result.push(Color::Yellow),
+            'G' => result.push(Color::Green),
+            'B' => result.push(Color::Blue),
+            'C' => result.push(Color::Cyan),
+            'P' => result.push(Color::Purple),
             _ => return Err("invalid color"),
         };
     }
@@ -191,12 +191,12 @@ fn color_name_to_color_symblol(color_name: &str) -> String {
 
 fn color_name_to_color(color_name: &str) -> Option<Color> {
     match color_name {
-        "red" => Some(Color::RED),
-        "green" => Some(Color::GREEN),
-        "yellow" => Some(Color::YELLOW),
-        "blue" => Some(Color::BLUE),
-        "purple" => Some(Color::PURPLE),
-        "cyan" => Some(Color::CYAN),
+        "red" => Some(Color::Red),
+        "green" => Some(Color::Green),
+        "yellow" => Some(Color::Yellow),
+        "blue" => Some(Color::Blue),
+        "purple" => Some(Color::Purple),
+        "cyan" => Some(Color::Cyan),
         _ => None,
     }
 }
