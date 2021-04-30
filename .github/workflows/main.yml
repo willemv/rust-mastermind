@@ -43,7 +43,7 @@ jobs:
       - run: npm run build
         working-directory: ./www
       - name: Deploy to Netlify
-        uses: nwtgck/actions-netlify@v1.0
+        uses: nwtgck/actions-netlify@v1.2
         with:
           publish-dir: './www/dist'
           production-branch: master
