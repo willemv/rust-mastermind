@@ -17,7 +17,7 @@ jobs:
         with:
           command: build
           args: --release
-  
+
   www:
     name: wasm-powered website
     runs-on: ubuntu-latest
@@ -35,7 +35,7 @@ jobs:
           version: 'latest'
       - uses: actions/setup-node@v1
         with:
-          node-version: '13.x'
+          node-version: '16.x'
       - run: wasm-pack build --out-dir mastermind-wasm -- --no-default-features
         working-directory: ./www
       - run: npm ci
