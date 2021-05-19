@@ -13,7 +13,7 @@ jobs:
           profile: minimal
           toolchain: stable
           override: true
-      - uses: actions-rs/cargo@v1.0.3
+      - uses: actions-rs/cargo@v1
         with:
           command: build
           args: --release
@@ -43,7 +43,7 @@ jobs:
       - run: npm run build
         working-directory: ./www
       - name: Deploy to Netlify
-        uses: nwtgck/actions-netlify@v1.2.2
+        uses: nwtgck/actions-netlify@v1
         with:
           publish-dir: './www/dist'
           production-branch: master
@@ -63,7 +63,7 @@ jobs:
           profile: minimal
           toolchain: stable
           override: true
-      - uses: actions-rs/cargo@v1.0.3
+      - uses: actions-rs/cargo@v1
         with:
           command: check
 
@@ -77,7 +77,7 @@ jobs:
           profile: minimal
           toolchain: stable
           override: true
-      - uses: actions-rs/cargo@v1.0.3
+      - uses: actions-rs/cargo@v1
         with:
           command: test
 
@@ -92,7 +92,7 @@ jobs:
           toolchain: stable
           override: true
       - run: rustup component add rustfmt
-      - uses: actions-rs/cargo@v1.0.3
+      - uses: actions-rs/cargo@v1
         with:
           command: fmt
           args: --all -- --check
@@ -108,7 +108,7 @@ jobs:
           toolchain: stable
           override: true
       - run: rustup component add clippy
-      - uses: actions-rs/cargo@v1.0.3
+      - uses: actions-rs/cargo@v1
         with:
           command: clippy
           args: -- -D warnings
