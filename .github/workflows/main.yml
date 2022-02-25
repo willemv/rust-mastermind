@@ -33,7 +33,7 @@ jobs:
         with:
           # Optional version of wasm-pack to install(eg. 'v0.9.1', 'latest')
           version: 'latest'
-      - uses: actions/setup-node@v2
+      - uses: actions/setup-node@v3.0.0
         with:
           node-version: '16.x'
       - run: wasm-pack build --out-dir mastermind-wasm -- --no-default-features
